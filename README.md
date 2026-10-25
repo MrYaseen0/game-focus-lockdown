@@ -1,4 +1,6 @@
-# GAME FOCUS — Android Game Lockdown & Performance Booster
+# 🎮 GAME FOCUS — Android Game Lockdown & Performance Booster
+
+> ✨ developed by **yaseenahmadexe** ✨
 
 > Open-source Android app that puts your phone into **total gaming lockdown**: kills every background app/service, frees RAM, blocks calls/SMS/WhatsApp notifications, and dedicates all CPU/GPU/RAM priority to **PUBG Mobile** and **Call of Duty Mobile**. Built for Samsung Galaxy A16 (and other Android 9+ devices).
 
