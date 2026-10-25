@@ -1,4 +1,4 @@
-# 🎮 GAME FOCUS — Android Game Lockdown & Performance Booster
+# 🎮 Gamer Pro — Android Game Lockdown & Performance Booster
 
 > ✨ developed by **yaseenahmadexe** ✨
 
