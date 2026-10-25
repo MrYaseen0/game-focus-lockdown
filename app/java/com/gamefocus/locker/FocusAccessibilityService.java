@@ -81,8 +81,8 @@ public class FocusAccessibilityService extends AccessibilityService {
             return;
         }
 
-        // grace period: let the user navigate to the game right after enabling
-        if (SystemClock.elapsedRealtime() - focusStartedAt < 3000) return;
+        // grace period: let the game fully load before enforcing lockdown
+        if (SystemClock.elapsedRealtime() - focusStartedAt < 8000) return;
         // do not fight the in-call screen while auto-reject is finishing the call
         if (pkg.startsWith("com.android.incallui") || pkg.startsWith("com.samsung.android.app.telephonyui")) return;
 
@@ -98,18 +98,14 @@ public class FocusAccessibilityService extends AccessibilityService {
         lastBounceAt = now;
         lastOffender = pkg;
 
+        // Close the intruder window first (no kill yet -> avoids the crash),
+        // then return to the game; clean up the process afterwards.
+        performGlobalAction(GLOBAL_ACTION_HOME);
+        launchPrimaryGame();
         try {
             ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
             am.killBackgroundProcesses(pkg);
         } catch (Exception ignore) {}
-
-        if (!sameAsLast) {
-            launchPrimaryGame();
-        } else {
-            // offender keeps coming back: hard bounce home first
-            performGlobalAction(GLOBAL_ACTION_HOME);
-            launchPrimaryGame();
-        }
     }
 
     private void launchPrimaryGame() {

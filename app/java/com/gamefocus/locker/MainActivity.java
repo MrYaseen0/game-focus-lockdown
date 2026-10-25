@@ -85,12 +85,26 @@ public class MainActivity extends Activity {
         root.setPadding(dp(20), dp(24), dp(20), dp(24));
         scroll.addView(root);
 
+        TextView logo = new TextView(this);
+        logo.setText("🎮");
+        logo.setTextSize(46);
+        logo.setGravity(Gravity.CENTER);
+        root.addView(logo);
+
         TextView title = new TextView(this);
-        title.setText("GAME FOCUS — LOCKDOWN");
+        title.setText("GAMER PRO — LOCKDOWN");
         title.setTextColor(Color.parseColor("#ffd54a"));
         title.setTextSize(24); title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setGravity(Gravity.CENTER);
         root.addView(title);
+
+        TextView credit = new TextView(this);
+        credit.setText("✨ developed by yaseenahmadexe ✨");
+        credit.setTextColor(Color.parseColor("#ff80ab"));
+        credit.setTextSize(12); credit.setTypeface(Typeface.DEFAULT_BOLD);
+        credit.setGravity(Gravity.CENTER);
+        credit.setPadding(0, dp(2), 0, dp(10));
+        root.addView(credit);
 
         TextView sub = new TextView(this);
         sub.setText("Total shutdown of everything except PUBG / COD.\nMedia sound always stays ON.");
@@ -121,6 +135,45 @@ public class MainActivity extends Activity {
         boostRow.addView(stopBtn, half);
         root.addView(boostRow);
 
+        Button gbBtn = new Button(this);
+        gbBtn.setText("OPEN GAME BOOSTER (com.yaseen.gamebooster)");
+        gbBtn.setTextSize(13);
+        gbBtn.setOnClickListener(v -> {
+            try {
+                Intent it = getPackageManager().getLaunchIntentForPackage("com.yaseen.gamebooster");
+                if (it == null) { Toast.makeText(this, "Game Booster not installed.", Toast.LENGTH_SHORT).show(); return; }
+                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(it);
+            } catch (Exception e) {
+                Toast.makeText(this, "Could not open Game Booster.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        root.addView(gbBtn, new LinearLayout.LayoutParams(-1, -2));
+
+        Button sgbBtn = new Button(this);
+        sgbBtn.setText("OPEN SAMSUNG GAME BOOSTER");
+        sgbBtn.setTextSize(13);
+        sgbBtn.setOnClickListener(v -> {
+            try {
+                Intent it = getPackageManager().getLaunchIntentForPackage("com.samsung.android.game.gamehome");
+                if (it == null) { Toast.makeText(this, "Samsung Game Booster not found.", Toast.LENGTH_SHORT).show(); return; }
+                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(it);
+            } catch (Exception e) {
+                Toast.makeText(this, "Could not open Samsung Game Booster.", Toast.LENGTH_SHORT).show();
+            }
+        });
+        root.addView(sgbBtn, new LinearLayout.LayoutParams(-1, -2));
+
+        Button settingsBtn = new Button(this);
+        settingsBtn.setText("OPEN ANDROID SETTINGS");
+        settingsBtn.setTextSize(13);
+        settingsBtn.setOnClickListener(v -> {
+            try { startActivity(new Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); }
+            catch (Exception e) { Toast.makeText(this, "Could not open Settings.", Toast.LENGTH_SHORT).show(); }
+        });
+        root.addView(settingsBtn, new LinearLayout.LayoutParams(-1, -2));
+
         ramText = new TextView(this);
         ramText.setTextColor(Color.parseColor("#59d879"));
         ramText.setTextSize(12);
@@ -149,6 +202,14 @@ public class MainActivity extends Activity {
         root.addView(note("Settings → Battery → Background usage limits → Never sleeping apps → add GAME FOCUS.\n"
                 + "Settings → Device care → Battery → More settings → disable 'Adaptive battery'.\n"
                 + "These stop Samsung from killing the booster itself."));
+
+        TextView stamp = new TextView(this);
+        stamp.setText("— crafted with 💙 by yaseenahmadexe —");
+        stamp.setTextColor(Color.parseColor("#7f8bb0"));
+        stamp.setTextSize(11);
+        stamp.setGravity(Gravity.CENTER);
+        stamp.setPadding(0, dp(16), 0, dp(8));
+        root.addView(stamp);
 
         setContentView(scroll);
     }
@@ -237,6 +298,7 @@ public class MainActivity extends Activity {
         Set<String> shown = new LinkedHashSet<>();
         // known PUBG / COD packages first (if installed) ...
         for (String pkg : Prefs.KNOWN_GAMES) {
+            if (pkg.equals("com.samsung.android.game.gamehome")) { shown.add(pkg); continue; } // always show Game Hub
             try { if (pm.getPackageInfo(pkg, 0) != null) shown.add(pkg); } catch (Exception ignore) {}
         }
         // ... then everything the user picked with "+ ADD A GAME" ...
@@ -303,6 +365,9 @@ public class MainActivity extends Activity {
             // later runs: only PUBG/CoD-family packages, honoring explicit removals
             for (String pkg : knownInstalled) if (!removed.contains(pkg)) sel.add(pkg);
         }
+        // always keep Samsung Game Hub protected by default (added even if hidden)
+        sel.add("com.samsung.android.game.gamehome");
+        Prefs.unmarkRemoved(this, "com.samsung.android.game.gamehome");
         Prefs.setSelectedGames(this, sel);
         // auto-start lockdown on (re)open unless the user explicitly stopped it
         if (!Prefs.isEnabled(this) && !Prefs.userStopped(this) && !sel.isEmpty()) {
@@ -312,6 +377,7 @@ public class MainActivity extends Activity {
 
     /** Packages that must never be auto-added as "games" even if flagged as one. */
     private boolean isEssentialUi(String pkg) {
+        if (pkg.equals("com.samsung.android.game.gamehome")) return false; // Game Hub is a real app, not essential UI
         return pkg.equals(getPackageName()) || pkg.startsWith("com.android.") || pkg.startsWith("com.samsung.android.");
     }
 
@@ -330,6 +396,7 @@ public class MainActivity extends Activity {
         if (pkg.startsWith("com.activision.callofduty.shooter")) return "COD MOBILE (Global)";
         if (pkg.startsWith("com.garena.game.codm")) return "COD MOBILE (Garena)";
         if (pkg.startsWith("com.tencent.tmgp.kr")) return "COD MOBILE (KR)";
+        if (pkg.startsWith("com.samsung.android.game.gamehome")) return "SAMSUNG GAME HUB / BOOSTER";
         return pkg;
     }
 
@@ -376,6 +443,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean isNotificationListenerOn() {
+        if (NotificationBlockerService.connected) return true;
         Set<String> list = new HashSet<>();
         String flat = Settings.Secure.getString(getContentResolver(), "enabled_notification_listeners");
         if (flat != null) for (String s : flat.split(":")) list.add(s.toLowerCase());

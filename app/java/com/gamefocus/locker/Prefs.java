@@ -19,6 +19,7 @@ public final class Prefs {
             "com.activision.callofduty.shooter",    // COD Mobile (global)
             "com.garena.game.codm",                 // COD Mobile (Garena)
             "com.tencent.tmgp.kr.callofduty",       // COD Mobile KR
+            "com.samsung.android.game.gamehome",    // Samsung Game Hub / Game Booster
     };
 
     public static boolean autoSetupDone(Context c) { return sp(c).getBoolean("auto_setup_done", false); }
@@ -66,10 +67,20 @@ public final class Prefs {
         // The locker app itself + essential system UI are always allowed so the
         // watchdog never fights its own UI, the launcher, keyboard or lock screen.
         out.add(c.getPackageName());
+        out.add("android");                          // system dialogs (volume, permissions)
         out.add("com.android.systemui");            // status bar, keyguard
         out.add("com.samsung.android.honeyboard");  // Samsung keyboard
         out.add("com.samsung.android.launcher.unified"); // One UI launcher
+        out.add("com.samsung.android.game.gamehome"); // Samsung Game Booster (never kill)
+        out.add("com.samsung.android.game.gos");      // Samsung Game Optimizer banner
+        out.add("com.samsung.android.game.gametools"); // Samsung Game Tools overlay
         out.add("com.sec.android.app.launcher");    // older Samsung launcher
+        // login windows that apps (PUBG/COD) open inside themselves — bouncing
+        // these kicks the player out of the game mid-login
+        out.add("com.google.android.webview");      // in-game login/SDK webviews
+        out.add("com.android.webview");
+        out.add("com.google.android.gms");          // Google sign-in dialogs
+        out.add("com.google.android.gsf");
         Set<String> games = sp(c).getStringSet("games", null);
         if (games != null) out.addAll(games);
         else { for (String g : KNOWN_GAMES) out.add(g); }
@@ -80,6 +91,7 @@ public final class Prefs {
         Set<String> def = new HashSet<>();
         def.add("com.tencent.ig");
         def.add("com.activision.callofduty.shooter");
+        def.add("com.samsung.android.game.gamehome");
         return new HashSet<>(sp(c).getStringSet("games", def));
     }
 

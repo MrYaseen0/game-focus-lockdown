@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gamefocus.locker"
-    android:versionCode="4"
-    android:versionName="2.2">
+    android:versionCode="15"
+    android:versionName="2.13">
 
     <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="33"/>
 
@@ -17,7 +17,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
-        android:label="GAME FOCUS"
+        android:label="Gamer Pro"
+        android:icon="@drawable/ic_launcher"
+        android:roundIcon="@drawable/ic_launcher"
         android:allowBackup="false"
         android:usesCleartextTraffic="false">
 

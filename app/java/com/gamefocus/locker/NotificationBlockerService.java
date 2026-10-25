@@ -14,12 +14,20 @@ import android.service.notification.StatusBarNotification;
  */
 public class NotificationBlockerService extends NotificationListenerService {
 
+    public static volatile boolean connected = false;
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean sweeping = false;
 
     @Override public void onListenerConnected() {
         super.onListenerConnected();
+        connected = true;
         startSweep();
+    }
+
+    @Override public void onListenerDisconnected() {
+        connected = false;
+        super.onListenerDisconnected();
     }
 
     @Override public void onNotificationPosted(StatusBarNotification sbn) {

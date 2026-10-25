@@ -43,6 +43,12 @@ public class BoosterService extends Service {
         // essential system processes a public app cannot kill anyway, but be explicit
         EXTRA_KEEP.add("com.android.systemui");
         EXTRA_KEEP.add("android");
+        EXTRA_KEEP.add("com.samsung.android.game.gamehome");
+        EXTRA_KEEP.add("com.samsung.android.game.gos");
+        EXTRA_KEEP.add("com.samsung.android.game.gametools");
+        EXTRA_KEEP.add("com.google.android.webview");
+        EXTRA_KEEP.add("com.google.android.gms");
+        EXTRA_KEEP.add("com.google.android.gsf");
     }
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -58,7 +64,21 @@ public class BoosterService extends Service {
         @Override public void run() {
             if (Prefs.isEnabled(BoosterService.this)) {
                 executor.execute(() -> {
-                    killBackground(BoosterService.this, true);
+                    // never kill while a protected game is in the foreground:
+                    // its background services (plugin, audio, net) must survive
+                    boolean gameInFg = false;
+                    try {
+                        for (ActivityManager.RunningAppProcessInfo p : am.getRunningAppProcesses()) {
+                            if (p.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                                for (String pkg : p.pkgList) {
+                                    if (Prefs.whitelistedPackages(BoosterService.this).contains(pkg)
+                                            && !pkg.equals(getPackageName())) { gameInFg = true; break; }
+                                }
+                            }
+                            if (gameInFg) break;
+                        }
+                    } catch (Exception ignore) {}
+                    if (!gameInFg) killBackground(BoosterService.this, true);
                     applyDnd(BoosterService.this);
                 });
             }
