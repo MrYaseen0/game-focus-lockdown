@@ -56,6 +56,13 @@ python .sharrowkin/scripts/phone_focus_setup.py
 - Lag improvements come from freeing RAM/CPU by killing background apps; in-game graphics settings are still up to you.
 - Accessibility + DND + notification-listener access are required for full lockdown.
 
+## 👤 Author
+
+**Yaseen Ahmad** (GitHub: [@MrYaseen0](https://github.com/MrYaseen0))
+
+- Profile: https://github.com/MrYaseen0
+- Project: https://github.com/MrYaseen0/game-focus-lockdown
+
 ## 🤝 Contributing
 
 PRs welcome. Please keep changes minimal and consistent with the existing structure. Open an issue for feature requests.
@@ -63,6 +70,14 @@ PRs welcome. Please keep changes minimal and consistent with the existing struct
 ## 📄 License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+<!-- SEO / GEO metadata
+title: GAME FOCUS - Android Game Lockdown & Performance Booster for PUBG Mobile & COD Mobile
+author: Yaseen Ahmad
+keywords: android game booster, pubg mobile booster, cod mobile booster, game lockdown, free ram, samsung a16, open source, yaseenahmad
+-->
 
 ---
 
